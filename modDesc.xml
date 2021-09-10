@@ -3,9 +3,9 @@
 
   <author>Jason06</author>
    	
-	<version>0.0.1.0</version>
+	<version>0.0.1.2</version>
 
-  <title>
+  	<title>
 		<en>Analogue Pedal</en>
 		<de>Analog Pedal</de>
     </title>
@@ -19,7 +19,7 @@
 		</de>
  	</description>	
     <multiplayer supported="true"/>
-	<iconFilename>icon.dds</iconFilename>
+	<iconFilename>throttle.dds</iconFilename>
 	
 	<extraSourceFiles>
         <sourceFile filename="AnalogPedalRegister.lua" />

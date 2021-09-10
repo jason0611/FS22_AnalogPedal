@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.1.0
+-- Version 0.0.1.2
 -- 
 --
 
@@ -17,8 +17,8 @@ AnalogPedal.MOD_NAME = g_currentModName
 
 AnalogPedal.isDedi = g_dedicatedServerInfo ~= nil
 
-AnalogPedal.incRate = 0.05
-AnalogPedal.decRate = 0.025
+AnalogPedal.incRate = 0.03
+AnalogPedal.decRate = 0.01
 
 AnalogPedal.guiIcon = createImageOverlay(g_currentModDirectory.."throttle.dds")
 
@@ -31,16 +31,11 @@ function AnalogPedal:setInc(apdRate)
 	if apdRate == nil then
 		return "Set increasement rate: apdInc #"
 	end
-	
-	local spec = vehicle.spec_AnalogPedal
-	if spec == nil then	
-		return "No APD installed"
-	end
-	
+
 	local rate = tonumber(apdRate)
 	if rate ~= nil then 
 		AnalogPedal.incRate = rate
-		return "Increasement rate set to "..tostring(spec.incRate)
+		return "Increasement rate set to "..tostring(AnalogPedal.incRate)
 	end
 end
 
@@ -52,15 +47,10 @@ function AnalogPedal:setDec(apdRate)
 		return "Set decreasement rate: apdDec #"
 	end
 	
-	local spec = vehicle.spec_AnalogPedal
-	if spec == nil then	
-		return "No APD installed"
-	end
-	
 	local rate = tonumber(apdRate)
 	if rate ~= nil then 
 		AnalogPedal.decRate = rate
-		return "Decreasement rate set to "..tostring(spec.decRate)
+		return "Decreasement rate set to "..tostring(AnalogPedal.decRate)
 	end
 end
 
@@ -226,7 +216,7 @@ function AnalogPedal:onDraw(dt)
 		g_currentMission:addExtraPrintText("Throttle: "..string.format("%.00f",tostring(spec.pedalRate * 100)).."%")
 		
 		local scale = g_gameSettings.uiScale
-		local x = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterX - g_currentMission.inGameMenu.hud.speedMeter.fuelGaugeRadiusX * 0.70
+		local x = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterX + g_currentMission.inGameMenu.hud.speedMeter.fuelGaugeRadiusX * 0.30
 		local y = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterY
 		local w = 0.015 * scale
 		local h = 0.015 * scale * g_screenAspectRatio * spec.pedalRate
