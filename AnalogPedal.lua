@@ -17,6 +17,11 @@ AnalogPedal.MOD_NAME = g_currentModName
 
 AnalogPedal.isDedi = g_dedicatedServerInfo ~= nil
 
+AnalogPedal.incRate = 0.05
+AnalogPedal.decRate = 0.025
+
+AnalogPedal.guiIcon = createImageOverlay(g_currentModDirectory.."throttle.dds")
+
 -- Console
 
 addConsoleCommand("apdInc", "Set increasement rate: apdInc #", "setInc", AnalogPedal)
@@ -34,7 +39,7 @@ function AnalogPedal:setInc(apdRate)
 	
 	local rate = tonumber(apdRate)
 	if rate ~= nil then 
-		spec.incRate = rate
+		AnalogPedal.incRate = rate
 		return "Increasement rate set to "..tostring(spec.incRate)
 	end
 end
@@ -54,7 +59,7 @@ function AnalogPedal:setDec(apdRate)
 	
 	local rate = tonumber(apdRate)
 	if rate ~= nil then 
-		spec.decRate = rate
+		AnalogPedal.decRate = rate
 		return "Decreasement rate set to "..tostring(spec.decRate)
 	end
 end
@@ -84,8 +89,6 @@ function AnalogPedal:onLoad(savegame)
 	-- spec.dirtyFlag = self:getNextDirtyFlag()
 	
 	spec.pedalRate = 0
-	spec.incRate = 0.05
-	spec.decRate = 0.025
 	spec.isActive = true
 end
 
@@ -221,6 +224,19 @@ function AnalogPedal:onDraw(dt)
 	local spec = self.spec_AnalogPedal
 	if spec.isActive then
 		g_currentMission:addExtraPrintText("Throttle: "..string.format("%.00f",tostring(spec.pedalRate * 100)).."%")
+		
+		local scale = g_gameSettings.uiScale
+		local x = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterX - g_currentMission.inGameMenu.hud.speedMeter.fuelGaugeRadiusX * 0.70
+		local y = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterY
+		local w, h
+		if spec.pedalRate < 0.5 then
+			w = 0.015 * scale * spec.pedalRate * 2 + 0.001
+			h = 0.015 * scale * g_screenAspectRatio
+		else
+			w = 0.015 * scale
+			h = w * g_screenAspectRatio * (1 - spec.pedalRate * 2)
+		end
+		renderOverlay(AnalogPedal.guiIcon, x, y, w, h)
 	else
 		g_currentMission:addExtraPrintText("Throttle: off")
 	end
@@ -228,7 +244,7 @@ end
 
 function AnalogPedal:onUpdate(dt)
 	local spec = self.spec_AnalogPedal
-	spec.pedalRate = spec.pedalRate - spec.decRate
+	spec.pedalRate = spec.pedalRate - AnalogPedal.decRate
 	if spec.pedalRate < 0 then spec.pedalRate = 0; end
 	if spec.pedalRate > 0 and spec.isActive then Drivable.actionEventAccelerate(self, "AXIS_ACCELERATE_VEHICLE", spec.pedalRate, nil, true); end
 end
@@ -237,7 +253,7 @@ function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, ca
 	local spec = self.spec_AnalogPedal
 	if spec.isActive then
 		if inputValue == 1 then
-			spec.pedalRate = spec.pedalRate + spec.incRate
+			spec.pedalRate = spec.pedalRate + AnalogPedal.incRate
 			if spec.pedalRate > 1 then spec.pedalRate = 1; end
 		end
 		return superfunc(self, actionName, spec.pedalRate, callbackState, true)
