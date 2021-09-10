@@ -228,14 +228,8 @@ function AnalogPedal:onDraw(dt)
 		local scale = g_gameSettings.uiScale
 		local x = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterX - g_currentMission.inGameMenu.hud.speedMeter.fuelGaugeRadiusX * 0.70
 		local y = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterY
-		local w, h
-		if spec.pedalRate < 0.5 then
-			w = 0.015 * scale * spec.pedalRate * 2 + 0.001
-			h = 0.015 * scale * g_screenAspectRatio
-		else
-			w = 0.015 * scale
-			h = w * g_screenAspectRatio * (1 - spec.pedalRate * 2)
-		end
+		local w = 0.015 * scale
+		local h = 0.015 * scale * g_screenAspectRatio * spec.pedalRate
 		renderOverlay(AnalogPedal.guiIcon, x, y, w, h)
 	else
 		g_currentMission:addExtraPrintText("Throttle: off")
