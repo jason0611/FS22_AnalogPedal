@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.1.2
+-- Version 0.0.1.3
 -- 
 --
 
@@ -80,6 +80,8 @@ function AnalogPedal:onLoad(savegame)
 	
 	spec.pedalRate = 0
 	spec.isActive = true
+	spec.analog = false
+	
 end
 
 function AnalogPedal:onPostLoad(savegame)
@@ -87,6 +89,9 @@ function AnalogPedal:onPostLoad(savegame)
 	if spec == nil then return end	
 	Drivable.actionEventAccelerate = Utils.overwrittenFunction(Drivable.actionEventAccelerate, AnalogPedal.actionEventAccelerate)
 	Drivable.actionEventBrake = Utils.overwrittenFunction(Drivable.actionEventBrake, AnalogPedal.actionEventBrake)
+	
+	-- Check if Mod VCA exists
+	spec.ModVCAFound = self.vcaSetState ~= nil
 end
 
 --[[
@@ -212,9 +217,15 @@ end
 
 function AnalogPedal:onDraw(dt)
 	local spec = self.spec_AnalogPedal
+	
 	if spec.isActive then
-		g_currentMission:addExtraPrintText("Throttle: "..string.format("%.00f",tostring(spec.pedalRate * 100)).."%")
-		
+		if self.vcaKSToggle then
+			g_currentMission:addExtraPrintText("Throttle: VCA")
+			return
+		end
+		local analog = ""
+		if spec.analog then analog = "(analog)"; end
+		g_currentMission:addExtraPrintText("Throttle: "..string.format("%.00f",tostring(spec.pedalRate * 100)).."% "..tostring(analog))
 		local scale = g_gameSettings.uiScale
 		local x = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterX + g_currentMission.inGameMenu.hud.speedMeter.fuelGaugeRadiusX * 0.30
 		local y = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterY
@@ -228,22 +239,27 @@ end
 
 function AnalogPedal:onUpdate(dt)
 	local spec = self.spec_AnalogPedal
+	if spec.analog then return; end
 	spec.pedalRate = spec.pedalRate - AnalogPedal.decRate
 	if spec.pedalRate < 0 then spec.pedalRate = 0; end
-	if spec.pedalRate > 0 and spec.isActive then Drivable.actionEventAccelerate(self, "AXIS_ACCELERATE_VEHICLE", spec.pedalRate, nil, true); end
+	if spec.pedalRate > 0 and spec.isActive then Drivable.actionEventAccelerate(self, "AXIS_ACCELERATE_VEHICLE", spec.pedalRate, nil, spec.analog); end
 end
 
 function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, callbackState, isAnalog)
 	local spec = self.spec_AnalogPedal
-	if spec.isActive then
-		if inputValue == 1 then
-			spec.pedalRate = spec.pedalRate + AnalogPedal.incRate
-			if spec.pedalRate > 1 then spec.pedalRate = 1; end
+	spec.analog = isAnalog
+	if spec.isActive then 
+		if not isAnalog and not self.vcaKSToggle then
+			if inputValue == 1 then
+				spec.pedalRate = spec.pedalRate + AnalogPedal.incRate
+				if spec.pedalRate > 1 then spec.pedalRate = 1; end
+			end
+			return superfunc(self, actionName, spec.pedalRate, callbackState, isAnalog)
+		else
+			spec.pedalRate = inputValue
 		end
-		return superfunc(self, actionName, spec.pedalRate, callbackState, true)
-	else
-		return superfunc(self, actionName, inputValue, callbackState, isAnalog)
 	end
+	return superfunc(self, actionName, inputValue, callbackState, isAnalog)
 end
 
 function AnalogPedal:actionEventBrake(superfunc, actionName, inputValue, callbackState, isAnalog)
