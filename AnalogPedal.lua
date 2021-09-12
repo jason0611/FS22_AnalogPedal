@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.1.3
+-- Version 0.0.1.5
 -- 
 --
 
@@ -239,9 +239,12 @@ end
 
 function AnalogPedal:onUpdate(dt)
 	local spec = self.spec_AnalogPedal
-	if spec.analog then return; end
-	spec.pedalRate = spec.pedalRate - AnalogPedal.decRate
-	if spec.pedalRate < 0 then spec.pedalRate = 0; end
+	if spec.analog or spec.pedalRate == 0 then return; end
+	if spec.pedalRate <= 0.01 then 
+		spec.pedalRate = 0.01
+	else
+		spec.pedalRate = spec.pedalRate - AnalogPedal.decRate
+	end
 	if spec.pedalRate > 0 and spec.isActive then Drivable.actionEventAccelerate(self, "AXIS_ACCELERATE_VEHICLE", spec.pedalRate, nil, spec.analog); end
 end
 
