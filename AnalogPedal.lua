@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.1.5
+-- Version 0.0.1.6
 -- 
 --
 
@@ -17,8 +17,9 @@ AnalogPedal.MOD_NAME = g_currentModName
 
 AnalogPedal.isDedi = g_dedicatedServerInfo ~= nil
 
-AnalogPedal.incRate = 0.03
+AnalogPedal.incRate = 0.02
 AnalogPedal.decRate = 0.01
+AnalogPedal.minRate = 0.01
 
 AnalogPedal.guiIcon = createImageOverlay(g_currentModDirectory.."throttle.dds")
 
@@ -239,13 +240,16 @@ end
 
 function AnalogPedal:onUpdate(dt)
 	local spec = self.spec_AnalogPedal
-	if spec.analog or spec.pedalRate == 0 then return; end
-	if spec.pedalRate <= 0.01 then 
-		spec.pedalRate = 0.01
-	else
-		spec.pedalRate = spec.pedalRate - AnalogPedal.decRate
+	if spec.analog or spec.pedalRate == 0 then 
+		return 
 	end
-	if spec.pedalRate > 0 and spec.isActive then Drivable.actionEventAccelerate(self, "AXIS_ACCELERATE_VEHICLE", spec.pedalRate, nil, spec.analog); end
+	spec.pedalRate = spec.pedalRate - AnalogPedal.decRate
+	if spec.pedalRate <= AnalogPedal.minRate then 
+		spec.pedalRate = AnalogPedal.minRate
+	end
+	if spec.pedalRate > 0 and spec.isActive then 
+		Drivable.actionEventAccelerate(self, "AXIS_ACCELERATE_VEHICLE", spec.pedalRate, nil, spec.analog)
+	end
 end
 
 function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, callbackState, isAnalog)
@@ -254,7 +258,7 @@ function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, ca
 	if spec.isActive then 
 		if not isAnalog and not self.vcaKSToggle then
 			if inputValue == 1 then
-				spec.pedalRate = spec.pedalRate + AnalogPedal.incRate
+				spec.pedalRate = spec.pedalRate + AnalogPedal.incRate + AnalogPedal.decRate -- compensate decreasement by onUpdate while accelerating
 				if spec.pedalRate > 1 then spec.pedalRate = 1; end
 			end
 			return superfunc(self, actionName, spec.pedalRate, callbackState, isAnalog)
