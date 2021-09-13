@@ -225,8 +225,14 @@ function AnalogPedal:onDraw(dt)
 			return
 		end
 		local analog = ""
-		if spec.analog then analog = "(analog)"; end
-		g_currentMission:addExtraPrintText("Throttle: "..string.format("%.00f",tostring(spec.pedalRate * 100)).."% "..tostring(analog))
+		if spec.analog then 
+			analog = " (analog)" 
+		end
+		local rate = string.format("%.00f",tostring(spec.pedalRate * 100)).."%"..analog
+		if spec.pedalRate == AnalogPedal.minRate and not spec.analog then
+			rate = "Freilauf"
+		end
+		g_currentMission:addExtraPrintText("Throttle: "..rate)
 		local scale = g_gameSettings.uiScale
 		local x = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterX + g_currentMission.inGameMenu.hud.speedMeter.fuelGaugeRadiusX * 0.30
 		local y = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterY
