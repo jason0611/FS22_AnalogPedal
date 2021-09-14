@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.1.6
+-- Version 0.0.1.7
 -- 
 --
 
@@ -200,7 +200,7 @@ end
 function AnalogPedal:onRegisterActionEvents(isActiveForInput)
 	AnalogPedal.actionEvents = {} 
 	if self.isClient then
-		headlandManagement.actionEvents = {} 
+		AnalogPedal.actionEvents = {} 
 		if self:getIsActiveForInput(true) then 
 			local actionEventId;
 			_, actionEventId = self:addActionEvent(AnalogPedal.actionEvents, 'APD_TOGGLESTATE', self, AnalogPedal.TOGGLESTATE, false, true, false, true, nil)
@@ -218,10 +218,11 @@ end
 
 function AnalogPedal:onDraw(dt)
 	local spec = self.spec_AnalogPedal
+	local throttle = g_i18n:getText("text_APD_throttle")
 	
 	if spec.isActive then
 		if self.vcaKSToggle then
-			g_currentMission:addExtraPrintText("Throttle: VCA")
+			g_currentMission:addExtraPrintText(throttle.."VCA")
 			return
 		end
 		local analog = ""
@@ -230,9 +231,9 @@ function AnalogPedal:onDraw(dt)
 		end
 		local rate = string.format("%.00f",tostring(spec.pedalRate * 100)).."%"..analog
 		if spec.pedalRate == AnalogPedal.minRate and not spec.analog then
-			rate = "Freilauf"
+			rate = g_i18n:getText("text_APD_spragclutch")
 		end
-		g_currentMission:addExtraPrintText("Throttle: "..rate)
+		g_currentMission:addExtraPrintText(throttle..rate)
 		local scale = g_gameSettings.uiScale
 		local x = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterX + g_currentMission.inGameMenu.hud.speedMeter.fuelGaugeRadiusX * 0.30
 		local y = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterY
@@ -240,7 +241,7 @@ function AnalogPedal:onDraw(dt)
 		local h = 0.015 * scale * g_screenAspectRatio * spec.pedalRate
 		renderOverlay(AnalogPedal.guiIcon, x, y, w, h)
 	else
-		g_currentMission:addExtraPrintText("Throttle: off")
+		g_currentMission:addExtraPrintText(throttle..g_i18n:getText("text_APD_off"))
 	end
 end
 
