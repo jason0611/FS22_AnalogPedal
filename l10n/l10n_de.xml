@@ -3,7 +3,7 @@
     <texts>
     	<text name="input_APD_TOGGLESTATE" text="Analoges Pedal: An / Aus"/>	
     	<text name="text_APD_throttle" text="Analoges Pedal: "/>	
-    	<text name="text_APD_coasting" text="Ausrollen"/>	
+    	<text name="text_APD_coasting" text="Minimal"/>	
     	<text name="text_APD_on" text="an"/>	
     	<text name="text_APD_off" text="aus"/>	
 	</texts>

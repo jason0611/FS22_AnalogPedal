@@ -3,7 +3,7 @@
 	<texts>
     	<text name="input_APD_TOGGLESTATE" text="Analog Throttle: On / Off"/>	
     	<text name="text_APD_throttle" text="Throttle: "/>	
-    	<text name="text_APD_coasting" text="Coasting"/>	
+    	<text name="text_APD_coasting" text="Minimal"/>	
     	<text name="text_APD_on" text="on"/>	
     	<text name="text_APD_off" text="off"/>	
 	</texts>
