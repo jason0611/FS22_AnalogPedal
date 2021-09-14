@@ -3,4 +3,16 @@
     <texts>
     	<text name="input_APD_TOGGLESTATE" text="Analoges Pedal: An / Aus"/>	
 	</texts>
+    <texts>
+    	<text name="text_APD_throttle" text="Analoges Pedal: "/>	
+	</texts>
+	<texts>
+    	<text name="text_APD_spragclutch" text="Freilauf"/>	
+	</texts>
+	<texts>
+    	<text name="text_APD_on" text="an"/>	
+	</texts>
+	<texts>
+    	<text name="text_APD_off" text="aus"/>	
+	</texts>
 </l10n>
