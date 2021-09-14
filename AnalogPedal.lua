@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.1.7
+-- Version 0.0.1.8
 -- 
 --
 
@@ -231,7 +231,7 @@ function AnalogPedal:onDraw(dt)
 		end
 		local rate = string.format("%.00f",tostring(spec.pedalRate * 100)).."%"..analog
 		if spec.pedalRate == AnalogPedal.minRate and not spec.analog then
-			rate = g_i18n:getText("text_APD_spragclutch")
+			rate = g_i18n:getText("text_APD_coasting")
 		end
 		g_currentMission:addExtraPrintText(throttle..rate)
 		local scale = g_gameSettings.uiScale

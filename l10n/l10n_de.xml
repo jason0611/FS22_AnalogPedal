@@ -7,7 +7,7 @@
     	<text name="text_APD_throttle" text="Analoges Pedal: "/>	
 	</texts>
 	<texts>
-    	<text name="text_APD_spragclutch" text="Freilauf"/>	
+    	<text name="text_APD_coasting" text="Ausrollen"/>	
 	</texts>
 	<texts>
     	<text name="text_APD_on" text="an"/>	

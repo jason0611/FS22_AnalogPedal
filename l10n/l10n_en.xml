@@ -7,7 +7,7 @@
     	<text name="text_APD_throttle" text="Throttle: "/>	
 	</texts>
 	<texts>
-    	<text name="text_APD_spragclutch" text="Sprag Clutch"/>	
+    	<text name="text_APD_coasting" text="Coasting"/>	
 	</texts>
 	<texts>
     	<text name="text_APD_on" text="on"/>	
