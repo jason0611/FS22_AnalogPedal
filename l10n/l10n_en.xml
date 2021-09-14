@@ -1,6 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
+	<texts>
+    	<text name="input_HLM_TOGGLESTATE" text="Analog Throttle: On / Off"/>	
+	</texts>
     <texts>
-    	<text name="input_HLM_TOGGLESTATE" text="Analogue Pedal: On / Off"/>	
+    	<text name="text_APD_throttle" text="Throttle: "/>	
+	</texts>
+	<texts>
+    	<text name="text_APD_spragclutch" text="Sprag Clutch"/>	
+	</texts>
+	<texts>
+    	<text name="text_APD_on" text="on"/>	
+	</texts>
+	<texts>
+    	<text name="text_APD_off" text="off"/>	
 	</texts>
 </l10n>
