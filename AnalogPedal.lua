@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.1.9
+-- Version 0.0.2.0
 -- 
 --
 
@@ -278,7 +278,7 @@ end
 
 function AnalogPedal:actionEventBrake(superfunc, actionName, inputValue, callbackState, isAnalog)
 	local spec = self.spec_AnalogPedal
-	if inputValue == 1 then 
+	if spec ~= nil and inputValue == 1 then 
 		spec.pedalRate = 0
 	end
 	return superfunc(self, actionName, inputValue, callbackState, isAnalog)
