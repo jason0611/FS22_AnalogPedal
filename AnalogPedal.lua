@@ -227,6 +227,7 @@ function AnalogPedal:onDraw(dt)
 		end
 		if self:getCruiseControlState() == 1 then
 			g_currentMission:addExtraPrintText(throttle.."SpeedControl")
+			return
 		end
 
 		local analog = ""
@@ -251,7 +252,7 @@ end
 
 function AnalogPedal:onUpdate(dt)
 	local spec = self.spec_AnalogPedal
-	if spec.analog or spec.pedalRate == 0 then 
+	if spec.analog or spec.pedalRate == 0 or self:getCruiseControlState() == 1 then 
 		return 
 	end
 	spec.pedalRate = spec.pedalRate - AnalogPedal.decRate
