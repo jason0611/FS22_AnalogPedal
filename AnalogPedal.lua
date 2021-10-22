@@ -267,7 +267,7 @@ function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, ca
 	local spec = self.spec_AnalogPedal
 	if spec ~= nil and spec.isActive then 
 		spec.analog = isAnalog
-		if not isAnalog and not self.vcaKSToggle and self.getCruiseControlState() ~= 1 then
+		if not isAnalog and not self.vcaKSToggle and self:getCruiseControlState() ~= 1 then
 			if inputValue == 1 then
 				spec.pedalRate = spec.pedalRate + AnalogPedal.incRate + AnalogPedal.decRate -- compensate decreasement by onUpdate while accelerating
 				if spec.pedalRate > 1 then spec.pedalRate = 1; end
