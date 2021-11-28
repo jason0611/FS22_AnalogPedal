@@ -2,7 +2,7 @@
 -- register
 --
 -- Martin Eller 
--- Version 0.0.3.0
+-- Version 0.0.4.0
 --
 -- 
 --
@@ -11,7 +11,7 @@ if g_specializationManager:getSpecializationByName("AnalogPedal") == nil then
 
   g_specializationManager:addSpecialization("AnalogPedal", "AnalogPedal", g_currentModDirectory.."AnalogPedal.lua", true, nil)
 
-  for typeName, typeEntry in pairs(g_vehicleTypeManager:getVehicleTypes()) do
+  for typeName, typeEntry in pairs(g_vehicleTypeManager.types) do
     
     if
     		SpecializationUtil.hasSpecialization(Drivable, typeEntry.specializations) 
@@ -30,10 +30,4 @@ if g_specializationManager:getSpecializationByName("AnalogPedal") == nil then
 		print("headlandManagement registered for "..typeName)
     end
   end
-end
-
--- make localizations available
-local i18nTable = getfenv(0).g_i18n
-for l18nId,l18nText in pairs(g_i18n.texts) do
-  i18nTable:setText(l18nId, l18nText)
 end

@@ -1,9 +1,9 @@
 --
--- AnalogPedal for LS 19
+-- AnalogPedal for LS 22
 --
 -- Martin Eller
 
--- Version 0.0.3.0
+-- Version 0.0.4.0
 -- 
 --
 
@@ -66,23 +66,14 @@ function AnalogPedal.registerEventListeners(vehicleType)
 	SpecializationUtil.registerEventListener(vehicleType, "onDraw", AnalogPedal)
 	SpecializationUtil.registerEventListener(vehicleType, "onLoad", AnalogPedal)
 	SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", AnalogPedal)
---	SpecializationUtil.registerEventListener(vehicleType, "saveToXMLFile", AnalogPedal)
 	SpecializationUtil.registerEventListener(vehicleType, "onRegisterActionEvents", AnalogPedal)
--- 	SpecializationUtil.registerEventListener(vehicleType, "onReadStream", AnalogPedal)
---	SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", AnalogPedal)
---	SpecializationUtil.registerEventListener(vehicleType, "onReadUpdateStream", AnalogPedal)
---	SpecializationUtil.registerEventListener(vehicleType, "onWriteUpdateStream", AnalogPedal)
 end
 
 function AnalogPedal:onLoad(savegame)
 	local spec = self.spec_AnalogPedal
-	
-	-- spec.dirtyFlag = self:getNextDirtyFlag()
-	
 	spec.pedalRate = 0
 	spec.isActive = true
 	spec.analog = false
-	
 end
 
 function AnalogPedal:onPostLoad(savegame)
@@ -95,107 +86,7 @@ function AnalogPedal:onPostLoad(savegame)
 	spec.ModVCAFound = self.vcaSetState ~= nil
 end
 
---[[
-function AnalogPedal:saveToXMLFile(xmlFile, key)
-	local spec = self.spec_AnalogPedal
-	setXMLBool(xmlFile, key.."#beep", spec.Beep)
-	setXMLFloat(xmlFile, key.."#turnSpeed", spec.TurnSpeed)
-	setXMLBool(xmlFile, key.."#isActive", spec.IsActive)
-	setXMLBool(xmlFile, key.."#useSpeedControl", spec.UseSpeedControl)
-	setXMLBool(xmlFile, key.."#useModSpeedControl", spec.UseModSpeedControl)
-	setXMLBool(xmlFile, key.."#useRaiseImplement", spec.UseRaiseImplement)
-	setXMLBool(xmlFile, key.."#useStopPTO", spec.UseStopPTO)
-	setXMLBool(xmlFile, key.."#turnPlow", spec.UseTurnPlow)
-	setXMLBool(xmlFile, key.."#centerPlow", spec.UseCenterPlow)
-	setXMLBool(xmlFile, key.."#switchRidge", spec.UseRidgeMarker)
-	setXMLBool(xmlFile, key.."#useGPS", spec.UseGPS)
-	setXMLBool(xmlFile, key.."#useGuidanceSteering", spec.UseGuidanceSteering)
-	setXMLBool(xmlFile, key.."#useVCA", spec.UseVCA)
-	setXMLBool(xmlFile, key.."#useDiffLock", spec.UseDiffLock)
-end
 
-function AnalogPedal:onReadStream(streamId, connection)
-	local spec = self.spec_AnalogPedal
-	spec.Beep = streamReadBool(streamId)
-	spec.TurnSpeed = streamReadFloat32(streamId)
-	spec.IsActive = streamReadBool(streamId)
-	spec.UseSpeedControl = streamReadBool(streamId)
-	spec.UseModSpeedControl = streamReadBool(streamId)
-	spec.UseRaiseImplement = streamReadBool(streamId)
-	spec.UseStopPTO = streamReadBool(streamId)
-	spec.UseTurnPlow = streamReadBool(streamId)
-	spec.UseCenterPlow = streamReadBool(streamId)
-  	spec.UseRidgeMarker = streamReadBool(streamId)
-  	spec.UseGPS = streamReadBool(streamId)
-  	spec.UseGuidanceSteering = streamReadBool(streamId)
-  	spec.UseVCA = streamReadBool(streamId)
-  	spec.UseDiffLock = streamReadBool(streamId)
-end
-
-function AnalogPedal:onWriteStream(streamId, connection)
-	local spec = self.spec_AnalogPedal
-	streamWriteBool(streamId, spec.Beep)
-	streamWriteFloat32(streamId, spec.TurnSpeed)
-	streamWriteBool(streamId, spec.IsActive)
-	streamWriteBool(streamId, spec.UseSpeedControl)
-	streamWriteBool(streamId, spec.UseModSpeedControl)
-	streamWriteBool(streamId, spec.UseRaiseImplement)
-	streamWriteBool(streamId, spec.UseStopPTO)
-	streamWriteBool(streamId, spec.UseTurnPlow)
-	streamWriteBool(streamId, spec.UseCenterPlow)
-  	streamWriteBool(streamId, spec.UseRidgeMarker)
-  	streamWriteBool(streamId, spec.UseGPS)
-  	streamWriteBool(streamId, spec.UseGuidanceSteering)
-  	streamWriteBool(streamId, spec.UseVCA)
-  	streamWriteBool(streamId, spec.UseDiffLock)
-end
-	
-function AnalogPedal:onReadUpdateStream(streamId, timestamp, connection)
-	if not connection:getIsServer() then
-		local spec = self.spec_AnalogPedal
-		if streamReadBool(streamId) then
-			spec.Beep = streamReadBool(streamId)
-			spec.TurnSpeed = streamReadFloat32(streamId)
-			spec.IsActive = streamReadBool(streamId)
-			spec.UseSpeedControl = streamReadBool(streamId)
-			spec.UseModSpeedControl = streamReadBool(streamId)
-			spec.UseRaiseImplement = streamReadBool(streamId)
-			spec.UseStopPTO = streamReadBool(streamId)
-			spec.UseTurnPlow = streamReadBool(streamId)
-			spec.UseCenterPlow = streamReadBool(streamId)
-			spec.UseRidgeMarker = streamReadBool(streamId)
-			spec.UseGPS = streamReadBool(streamId)
-			spec.UseGuidanceSteering = streamReadBool(streamId)
-			spec.UseVCA = streamReadBool(streamId)
-			spec.UseDiffLock = streamReadBool(streamId)
-		end;
-	end
-end
-
-function AnalogPedal:onWriteUpdateStream(streamId, connection, dirtyMask)
-	if connection:getIsServer() then
-		local spec = self.spec_AnalogPedal
-		if streamWriteBool(streamId, bitAND(dirtyMask, spec.dirtyFlag) ~= 0) then
-			streamWriteBool(streamId, spec.Beep)
-			streamWriteFloat32(streamId, spec.TurnSpeed)
-			streamWriteBool(streamId, spec.IsActive)
-			streamWriteBool(streamId, spec.UseSpeedControl)
-			streamWriteBool(streamId, spec.UseModSpeedControl)
-			streamWriteBool(streamId, spec.UseRaiseImplement)
-			streamWriteBool(streamId, spec.UseStopPTO)
-			streamWriteBool(streamId, spec.UseTurnPlow)
-			streamWriteBool(streamId, spec.UseCenterPlow)
-			streamWriteBool(streamId, spec.UseRidgeMarker)
-			streamWriteBool(streamId, spec.UseGPS)
-			streamWriteBool(streamId, spec.UseGuidanceSteering)
-			streamWriteBool(streamId, spec.UseVCA)
-			streamWriteBool(streamId, spec.UseDiffLock)
-		end
-	end
-end
-]]
-
--- inputBindings / inputActions
 	
 function AnalogPedal:onRegisterActionEvents(isActiveForInput)
 	AnalogPedal.actionEvents = {} 
@@ -211,14 +102,13 @@ end
 function AnalogPedal:TOGGLESTATE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.isActive = not spec.isActive
-	--self:raiseDirtyFlags(spec.dirtyFlag)
 end
 
 -- Main part
 
 function AnalogPedal:onDraw(dt)
 	local spec = self.spec_AnalogPedal
-	local throttle = g_i18n:getText("text_APD_throttle")
+	local throttle = g_i18n.modEnvironments[AnalogPedal.MOD_NAME]:getText("text_APD_throttle")
 	
 	if spec.isActive then
 		if self.vcaKSToggle then
@@ -246,7 +136,7 @@ function AnalogPedal:onDraw(dt)
 		local h = 0.015 * scale * g_screenAspectRatio * spec.pedalRate
 		renderOverlay(AnalogPedal.guiIcon, x, y, w, h)
 	else
-		g_currentMission:addExtraPrintText(throttle..g_i18n:getText("text_APD_off"))
+		g_currentMission:addExtraPrintText(throttle..g_i18n.modEnvironments[AnalogPedal.MOD_NAME]:getText("text_APD_off"))
 	end
 end
 
