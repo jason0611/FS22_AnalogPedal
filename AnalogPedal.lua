@@ -111,7 +111,7 @@ function AnalogPedal:onDraw(dt)
 	local throttle = g_i18n.modEnvironments[AnalogPedal.MOD_NAME]:getText("text_APD_throttle")
 	
 	if spec.isActive then
-		if self.vcaKSToggle then
+		if self.vcaGetState ~= nil and self:vcaGetState("ksToggle") then
 			g_currentMission:addExtraPrintText(throttle.."VCA")
 			return
 		end
@@ -158,7 +158,7 @@ function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, ca
 	local spec = self.spec_AnalogPedal
 	if spec ~= nil and spec.isActive then 
 		spec.analog = isAnalog
-		if not isAnalog and not self.vcaKSToggle and self:getCruiseControlState() ~= 1 then
+		if not isAnalog and (self.vcaGetState ~= nil and not self:vcaGetSTate("ksToggle")) and self:getCruiseControlState() ~= 1 then
 			if inputValue == 1 then
 				spec.pedalRate = spec.pedalRate + AnalogPedal.incRate + AnalogPedal.decRate -- compensate decreasement by onUpdate while accelerating
 				if spec.pedalRate > 1 then spec.pedalRate = 1; end
