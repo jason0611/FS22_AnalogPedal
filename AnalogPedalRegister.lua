@@ -2,7 +2,7 @@
 -- register
 --
 -- Martin Eller 
--- Version 0.0.4.1
+-- Version 0.0.4.2
 --
 -- 
 --
