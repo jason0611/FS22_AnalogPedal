@@ -96,6 +96,7 @@ function AnalogPedal:onRegisterActionEvents(isActiveForInput)
 		if self:getIsActiveForInput(true) then 
 			local actionEventId;
 			_, actionEventId = self:addActionEvent(AnalogPedal.actionEvents, 'APD_TOGGLESTATE', self, AnalogPedal.TOGGLESTATE, false, true, false, true, nil)
+			_, actionEventId = self:addActionEvent(AnalogPedal.actionEvents, 'APD_TOGGLEOVERRIDE', self, AnalogPedal.TOGGLEOVERRIDE, false, true, false, true, nil)
 		end		
 	end
 end
