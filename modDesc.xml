@@ -3,7 +3,7 @@
 
   <author>Jason06</author>
    	
-	<version>0.0.4.2</version>
+	<version>0.0.5.0</version>
 
   	<title>
 		<en>Analogue Pedal</en>
@@ -29,11 +29,15 @@
 	
 	<actions>
 		<action name="APD_TOGGLESTATE" category="VEHICLE" ignoreComboMask="false" />
+		<action name="APD_TOGGLEOVERRIDE" categorie="VEHICLE" ignoreComboMask="false" />
 	</actions>
 
 	<inputBinding>	
 		<actionBinding action="APD_TOGGLESTATE">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_w" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_w" neutralInput="0" index="1" />
+		</actionBinding>
+		<actionBinding action="APD_TOGGLEOVERRIDE">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_ralt KEY_w" neutralInput="0" index="1" />
 		</actionBinding>
 	</inputBinding>
 

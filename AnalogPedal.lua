@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.4.2
+-- Version 0.0.5.0
 -- 
 --
 
@@ -74,6 +74,7 @@ function AnalogPedal:onLoad(savegame)
 	spec.pedalRate = 0
 	spec.isActive = true
 	spec.analog = false
+	spec.overrideAnalog = false
 end
 
 function AnalogPedal:onPostLoad(savegame)
@@ -104,6 +105,10 @@ function AnalogPedal:TOGGLESTATE(actionName, keyStatus, arg3, arg4, arg5)
 	spec.isActive = not spec.isActive
 end
 
+function AnalogPedal:TOGGLEOVERRIDE(actionName, keyStatus, arg3, arg4, arg5)
+	local spec = self.spec_AnalogPedal
+	spec.overrideAnalog = not spec.overrideAnalog
+end
 -- Main part
 
 function AnalogPedal:onDraw(dt)
@@ -156,6 +161,7 @@ end
 
 function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, callbackState, isAnalog)
 	local spec = self.spec_AnalogPedal
+	isAnalog = isAnalog and not spec.overrideAnalog
 	if spec ~= nil and spec.isActive then 
 		spec.analog = isAnalog
 		if not isAnalog and (self.vcaGetState ~= nil and not self:vcaGetState("ksToggle")) and self:getCruiseControlState() ~= 1 then
