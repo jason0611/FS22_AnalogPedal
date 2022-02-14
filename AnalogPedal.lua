@@ -162,6 +162,7 @@ end
 
 function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, callbackState, isAnalog)
 	local spec = self.spec_AnalogPedal
+	local returnValue = inputValue
 	isAnalog = isAnalog and not spec.overrideAnalog
 	if spec ~= nil and spec.isActive then 
 		spec.analog = isAnalog
@@ -170,17 +171,20 @@ function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, ca
 				spec.pedalRate = spec.pedalRate + AnalogPedal.incRate + AnalogPedal.decRate -- compensate decreasement by onUpdate while accelerating
 				if spec.pedalRate > 1 then spec.pedalRate = 1; end
 			end
-			return superfunc(self, actionName, spec.pedalRate, callbackState, isAnalog)
+			--return superfunc(self, actionName, spec.pedalRate, callbackState, isAnalog)
 		else
-			spec.pedalRate = inputValue
+			if not isAnalog or inputValue ~= 0 then
+				spec.pedalRate = inputValue
+			end
 		end
+		returnValue = spec.pedalRate
 	end
-	return superfunc(self, actionName, inputValue, callbackState, isAnalog)
+	return superfunc(self, actionName, returnValue, callbackState, isAnalog)
 end
 
 function AnalogPedal:actionEventBrake(superfunc, actionName, inputValue, callbackState, isAnalog)
 	local spec = self.spec_AnalogPedal
-	if spec ~= nil and inputValue == 1 then 
+	if spec ~= nil and inputValue >= 0.1 then 
 		spec.pedalRate = 0
 	end
 	return superfunc(self, actionName, inputValue, callbackState, isAnalog)
