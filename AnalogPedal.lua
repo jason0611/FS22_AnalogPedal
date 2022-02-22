@@ -163,8 +163,8 @@ end
 function AnalogPedal:actionEventAccelerate(superfunc, actionName, inputValue, callbackState, isAnalog)
 	local spec = self.spec_AnalogPedal
 	local returnValue = inputValue
-	isAnalog = isAnalog and not spec.overrideAnalog
 	if spec ~= nil and spec.isActive then 
+		isAnalog = isAnalog and not spec.overrideAnalog
 		spec.analog = isAnalog
 		if not isAnalog and (self.vcaGetState ~= nil and not self:vcaGetState("ksToggle")) and self:getCruiseControlState() ~= 1 then
 			if inputValue == 1 then
