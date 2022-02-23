@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.5.1
+-- Version 0.0.6.0
 -- 
 --
 
@@ -14,14 +14,62 @@ GMSDebug:enableConsoleCommands("apdDebug")
 
 AnalogPedal = {}
 AnalogPedal.MOD_NAME = g_currentModName
-
-AnalogPedal.isDedi = g_dedicatedServerInfo ~= nil
+AnalogPedal.MODSETTINGSDIR = g_currentModSettingsDirectory
 
 AnalogPedal.incRate = 0.02
 AnalogPedal.decRate = 0.01
 AnalogPedal.minRate = 0.01
 
 AnalogPedal.guiIcon = createImageOverlay(g_currentModDirectory.."throttle.dds")
+
+-- load / save settings
+
+local function saveSettings(spec)
+	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
+	local key = "settings"
+	local saved = false
+	
+	createFolder(AnalogPedal.MODSETTINGSDIR)
+	local xmlFile = XMLFile.create("settingsXML", filename, key)
+
+	if spec~= nil and xmlFile ~= nil then 		
+		dbgprint("saveSettings : key: "..tostring(key), 2)
+
+		xmlFile:setBool(key..".isActive", spec.isActive)
+		xmlFile:setBool(key..".overrideAnalog", spec.overrideAnalog)
+		xmlFile:setFloat(key.."incRate", AnalogPedal.incRate)
+		xmlFile:setFloat(key.."decRate", AnalogPedal.decRate)
+		
+		xmlFile:save()
+		xmlFile:delete()
+		dbgprint("saveSettings : saving data finished", 2)
+		saved = true
+	end
+	return saved
+end
+
+local function loadSettings(spec)
+	local loaded = false
+	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
+	local key = "settings"
+	
+	createFolder(AnalogPedal.MODSETTINGSDIR)
+	local xmlFile = XMLFile.loadIfExists("settingsXML", filename, key)
+	
+	if spec ~= nil and xmlFile ~= nil then
+		dbgprint("loadSettings : spec: "..tostring(spec), 2)
+	
+		spec.isActive = xmlFile:getBool(key..".isActive")
+		spec.overrideAnalog = xmlFile:getBool(key..".overrideAnalog")
+		AnalogPedal.incRate = xmlFile:getFloat(key..".incRate")
+		AnalogPedal.decRate = xmlFile:getFloat(key..".decRate")
+
+		xmlFile:delete()
+		dbgprint("loadSettings : loading data finished", 2)
+		loaded = true
+	end
+	return loaded, spec
+end
 
 -- Console
 
@@ -35,7 +83,9 @@ function AnalogPedal:setInc(apdRate)
 
 	local rate = tonumber(apdRate)
 	if rate ~= nil then 
+		local spec = self.spec_AnalogPedal
 		AnalogPedal.incRate = rate
+		saveSettings(spec)
 		return "Increasement rate set to "..tostring(AnalogPedal.incRate)
 	end
 end
@@ -50,7 +100,9 @@ function AnalogPedal:setDec(apdRate)
 	
 	local rate = tonumber(apdRate)
 	if rate ~= nil then 
+		local spec = self.spec_AnalogPedal
 		AnalogPedal.decRate = rate
+		saveSettings(spec)
 		return "Decreasement rate set to "..tostring(AnalogPedal.decRate)
 	end
 end
@@ -85,10 +137,10 @@ function AnalogPedal:onPostLoad(savegame)
 	
 	-- Check if Mod VCA exists
 	spec.ModVCAFound = self.vcaSetState ~= nil
+	
+	_, spec = loadSettings(spec)
 end
 
-
-	
 function AnalogPedal:onRegisterActionEvents(isActiveForInput)
 	AnalogPedal.actionEvents = {} 
 	if self.isClient then
@@ -104,12 +156,15 @@ end
 function AnalogPedal:TOGGLESTATE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.isActive = not spec.isActive
+	saveSettings(spec)
 end
 
 function AnalogPedal:TOGGLEOVERRIDE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.overrideAnalog = not spec.overrideAnalog
+	saveSettings(spec)
 end
+
 -- Main part
 
 function AnalogPedal:onDraw(dt)
