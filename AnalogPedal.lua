@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.0.6.0
+-- Version 0.1.0.0
 -- 
 --
 
@@ -22,55 +22,6 @@ AnalogPedal.minRate = 0.01
 
 AnalogPedal.guiIcon = createImageOverlay(g_currentModDirectory.."throttle.dds")
 
--- load / save settings
-
-local function saveSettings(spec)
-	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
-	local key = "settings"
-	local saved = false
-	
-	createFolder(AnalogPedal.MODSETTINGSDIR)
-	local xmlFile = XMLFile.create("settingsXML", filename, key)
-
-	if spec~= nil and xmlFile ~= nil then 		
-		dbgprint("saveSettings : key: "..tostring(key), 2)
-
-		xmlFile:setBool(key..".isActive", spec.isActive)
-		xmlFile:setBool(key..".overrideAnalog", spec.overrideAnalog)
-		xmlFile:setFloat(key.."incRate", AnalogPedal.incRate)
-		xmlFile:setFloat(key.."decRate", AnalogPedal.decRate)
-		
-		xmlFile:save()
-		xmlFile:delete()
-		dbgprint("saveSettings : saving data finished", 2)
-		saved = true
-	end
-	return saved
-end
-
-local function loadSettings(spec)
-	local loaded = false
-	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
-	local key = "settings"
-	
-	createFolder(AnalogPedal.MODSETTINGSDIR)
-	local xmlFile = XMLFile.loadIfExists("settingsXML", filename, key)
-	
-	if spec ~= nil and xmlFile ~= nil then
-		dbgprint("loadSettings : spec: "..tostring(spec), 2)
-	
-		spec.isActive = xmlFile:getBool(key..".isActive")
-		spec.overrideAnalog = xmlFile:getBool(key..".overrideAnalog")
-		AnalogPedal.incRate = xmlFile:getFloat(key..".incRate")
-		AnalogPedal.decRate = xmlFile:getFloat(key..".decRate")
-
-		xmlFile:delete()
-		dbgprint("loadSettings : loading data finished", 2)
-		loaded = true
-	end
-	return loaded, spec
-end
-
 -- Console
 
 addConsoleCommand("apdInc", "Set increasement rate: apdInc #", "setInc", AnalogPedal)
@@ -85,7 +36,7 @@ function AnalogPedal:setInc(apdRate)
 	if rate ~= nil then 
 		local spec = self.spec_AnalogPedal
 		AnalogPedal.incRate = rate
-		saveSettings(spec)
+		AnalogPedal.saveSettings(self)
 		return "Increasement rate set to "..tostring(AnalogPedal.incRate)
 	end
 end
@@ -102,7 +53,7 @@ function AnalogPedal:setDec(apdRate)
 	if rate ~= nil then 
 		local spec = self.spec_AnalogPedal
 		AnalogPedal.decRate = rate
-		saveSettings(spec)
+		AnalogPedal.saveSettings(self)
 		return "Decreasement rate set to "..tostring(AnalogPedal.decRate)
 	end
 end
@@ -138,7 +89,7 @@ function AnalogPedal:onPostLoad(savegame)
 	-- Check if Mod VCA exists
 	spec.ModVCAFound = self.vcaSetState ~= nil
 	
-	_, spec = loadSettings(spec)
+	_, spec = AnalogPedal.loadSettings(self)
 end
 
 function AnalogPedal:onRegisterActionEvents(isActiveForInput)
@@ -156,13 +107,65 @@ end
 function AnalogPedal:TOGGLESTATE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.isActive = not spec.isActive
-	saveSettings(spec)
+	AnalogPedal.saveSettings(self)
 end
 
 function AnalogPedal:TOGGLEOVERRIDE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.overrideAnalog = not spec.overrideAnalog
-	saveSettings(spec)
+	AnalogPedal.saveSettings(self)
+end
+
+-- load / save settings
+
+function AnalogPedal:saveSettings()
+	local spec = self.spec_AnalogPedal
+	
+	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
+	local key = "settings"
+	local saved = false
+	
+	createFolder(AnalogPedal.MODSETTINGSDIR)
+	local xmlFile = XMLFile.create("settingsXML", filename, key)
+
+	if spec~= nil and xmlFile ~= nil then 		
+		dbgprint("saveSettings : key: "..tostring(key), 2)
+
+		xmlFile:setBool(key..".isActive", spec.isActive)
+		xmlFile:setBool(key..".overrideAnalog", spec.overrideAnalog)
+		xmlFile:setFloat(key.."incRate", AnalogPedal.incRate)
+		xmlFile:setFloat(key.."decRate", AnalogPedal.decRate)
+		
+		xmlFile:save()
+		xmlFile:delete()
+		dbgprint("saveSettings : saving data finished", 2)
+		saved = true
+	end
+	return saved
+end
+
+function AnalogPedal:loadSettings()
+	local spec = self.spec_AnalogPedal
+	local loaded = false
+	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
+	local key = "settings"
+	
+	createFolder(AnalogPedal.MODSETTINGSDIR)
+	local xmlFile = XMLFile.loadIfExists("settingsXML", filename, key)
+	
+	if spec ~= nil and xmlFile ~= nil then
+		dbgprint("loadSettings : spec: "..tostring(spec), 2)
+	
+		spec.isActive = xmlFile:getBool(key..".isActive") or spec.isActive
+		spec.overrideAnalog = xmlFile:getBool(key..".overrideAnalog") or spec.overrideAnalog
+		AnalogPedal.incRate = xmlFile:getFloat(key..".incRate") or AnalogPedal.incRate
+		AnalogPedal.decRate = xmlFile:getFloat(key..".decRate") or AnalogPedal.decRate
+
+		xmlFile:delete()
+		dbgprint("loadSettings : loading data finished", 2)
+		loaded = true
+	end
+	return loaded, spec
 end
 
 -- Main part

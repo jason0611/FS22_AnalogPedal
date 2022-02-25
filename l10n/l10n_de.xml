@@ -1,10 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
     <texts>
-    	<text name="input_APD_TOGGLESTATE" text="Analoges Pedal: An / Aus"/>	
+    	<text name="input_APD_TOGGLESTATE" text="Analoges Pedal an/aus"/>	
+    	<text name="input_APD_TOGGLEOVERRIDE" text="Analog-Erkennung an/aus"/>
     	<text name="text_APD_throttle" text="Analoges Pedal: "/>	
     	<text name="text_APD_coasting" text="Minimal"/>	
     	<text name="text_APD_on" text="an"/>	
-    	<text name="text_APD_off" text="aus"/>	
+    	<text name="text_APD_off" text="aus"/>
+    	<text name="input_APD_TOGGLEOVERRIDE" text="Analog-Erkennung an/aus"/>	
 	</texts>
 </l10n>

@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <l10n>
 	<texts>
-    	<text name="input_APD_TOGGLESTATE" text="Analog Throttle: On / Off"/>	
+    	<text name="input_APD_TOGGLESTATE" text="Analog Throttle on/off"/>	
+    	<text name="input_APD_TOGGLEOVERRIDE" text="Analog-Detection on/off"/>	
     	<text name="text_APD_throttle" text="Throttle: "/>	
     	<text name="text_APD_coasting" text="Minimal"/>	
     	<text name="text_APD_on" text="on"/>	
