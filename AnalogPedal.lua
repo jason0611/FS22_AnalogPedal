@@ -194,7 +194,7 @@ function AnalogPedal:onDraw(dt)
 		end
 		g_currentMission:addExtraPrintText(throttle..rate)
 		local scale = g_gameSettings.uiScale
-		local x = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterX + g_currentMission.inGameMenu.hud.speedMeter.fuelGaugeRadiusX * 0.30
+		local x = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterX + g_currentMission.inGameMenu.hud.speedMeter.speedIndicatorRadiusX * 0.4
 		local y = g_currentMission.inGameMenu.hud.speedMeter.gaugeCenterY
 		local w = 0.015 * scale
 		local h = 0.015 * scale * g_screenAspectRatio * spec.pedalRate
