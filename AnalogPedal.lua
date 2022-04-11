@@ -3,7 +3,7 @@
 --
 -- Martin Eller
 
--- Version 0.1.0.0
+-- Version 0.1.0.1
 -- 
 --
 
@@ -75,7 +75,7 @@ end
 function AnalogPedal:onLoad(savegame)
 	local spec = self.spec_AnalogPedal
 	spec.pedalRate = 0
-	spec.isActive = true
+	spec.isActive = false
 	spec.analog = false
 	spec.overrideAnalog = false
 end

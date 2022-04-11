@@ -2,7 +2,7 @@
 -- register
 --
 -- Martin Eller 
--- Version 0.1.0.0
+-- Version 0.1.0.1
 --
 -- 
 --
@@ -27,7 +27,7 @@ if g_specializationManager:getSpecializationByName("AnalogPedal") == nil then
     
     then
       	g_vehicleTypeManager:addSpecialization(typeName, "AnalogPedal")
-		print("headlandManagement registered for "..typeName)
+		print("AnalogPedal registered for "..typeName)
     end
   end
 end
