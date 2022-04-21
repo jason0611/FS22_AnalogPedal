@@ -9,7 +9,9 @@
 
 if g_specializationManager:getSpecializationByName("AnalogPedal") == nil then
 
-  g_specializationManager:addSpecialization("AnalogPedal", "AnalogPedal", g_currentModDirectory.."AnalogPedal.lua", true, nil)
+  local specName = g_currentModName
+  
+  g_specializationManager:addSpecialization("AnalogPedal", "AnalogPedal", g_currentModDirectory.."AnalogPedal.lua", nil)
 
   for typeName, typeEntry in pairs(g_vehicleTypeManager.types) do
     
@@ -26,7 +28,7 @@ if g_specializationManager:getSpecializationByName("AnalogPedal") == nil then
     )
     
     then
-      	g_vehicleTypeManager:addSpecialization(typeName, "AnalogPedal")
+      	g_vehicleTypeManager:addSpecialization(typeName, specName..".AnalogPedal")
 		print("AnalogPedal registered for "..typeName)
     end
   end

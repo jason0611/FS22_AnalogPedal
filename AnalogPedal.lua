@@ -73,6 +73,7 @@ function AnalogPedal.registerEventListeners(vehicleType)
 end
 
 function AnalogPedal:onLoad(savegame)
+	self.spec_AnalogPedal = self["spec_"..AnalogPedal.MOD_NAME..".AnalogPedal"]
 	local spec = self.spec_AnalogPedal
 	spec.pedalRate = 0
 	spec.isActive = false
