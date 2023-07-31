@@ -69,7 +69,22 @@ function AnalogPedal.registerEventListeners(vehicleType)
 	SpecializationUtil.registerEventListener(vehicleType, "onDraw", AnalogPedal)
 	SpecializationUtil.registerEventListener(vehicleType, "onLoad", AnalogPedal)
 	SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", AnalogPedal)
+	SpecializationUtil.registerEventListener(vehicleType, "saveToXMLFile", AnalogPedal)
+	SpecializationUtil.registerEventListener(vehicleType, "onReadStream", AnalogPedal)
+	SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", AnalogPedal)
+	SpecializationUtil.registerEventListener(vehicleType, "onReadUpdateStream", AnalogPedal)
+	SpecializationUtil.registerEventListener(vehicleType, "onWriteUpdateStream", AnalogPedal)
 	SpecializationUtil.registerEventListener(vehicleType, "onRegisterActionEvents", AnalogPedal)
+end
+
+function AnalogPedal.initSpecialization()
+	dbgprint("initSpecialization : start", 2)
+	local schemaKey = AnalogPedal.MOD_NAME..".AnalogPedal"
+	schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?)."..key.."#isActive", "APD actived", false)
+	schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?)."..key.."#overrideAnalog", "Override analogue input", false)
+    schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?)."..key.."#incRate", "Increase rate", 0.02)
+	schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?)."..key.."#decRate", "Audible alert volume", 0.01)
+	dbgprint("initSpecialization: finished xmlSchemaSavegame registration process", 1)
 end
 
 function AnalogPedal:onLoad(savegame)
@@ -79,9 +94,11 @@ function AnalogPedal:onLoad(savegame)
 	spec.isActive = false
 	spec.analog = false
 	spec.overrideAnalog = false
+	spec.dirtyFlag = self:getNextDirtyFlag()
 end
 
 function AnalogPedal:onPostLoad(savegame)
+	dbgprint("onPostLoad", 2)
 	local spec = self.spec_AnalogPedal
 	if spec == nil then return end	
 	Drivable.actionEventAccelerate = Utils.overwrittenFunction(Drivable.actionEventAccelerate, AnalogPedal.actionEventAccelerate)
@@ -90,7 +107,73 @@ function AnalogPedal:onPostLoad(savegame)
 	-- Check if Mod VCA exists
 	spec.ModVCAFound = self.vcaSetState ~= nil
 	
-	_, spec = AnalogPedal.loadSettings(self)
+	if savegame ~= nil then	
+		dbgprint("onPostLoad : loading saved data", 2)
+	
+		spec.isActive = xmlFile:getValue(key..".isActive", spec.isActive)
+		spec.overrideAnalog = xmlFile:getValue(key..".overrideAnalog", spec.overrideAnalog)
+		AnalogPedal.incRate = xmlFile:getFloat(key..".incRate") or AnalogPedal.incRate
+		AnalogPedal.decRate = xmlFile:getFloat(key..".decRate") or AnalogPedal.decRate
+		
+		dbgprint("onPostLoad : Loaded data for "..self:getName(), 1)
+	end
+end
+
+function AnalogPedal:saveToXMLFile(xmlFile, key, usedModNames)
+	dbgprint("saveToXMLFile", 2)
+	local spec = self.spec_AnalogPedal
+		
+	xmlFile:setValue(key..".isActive", spec.isActive)
+	xmlFile:setValue(key..".overrideAnalog", spec.overrideAnalog)
+	xmlFile:setValue(key..".incRate", AnalogPedal.incRate)
+	xmlFile:setValue(key..".decRate", AnalogPedal.decRate)	
+		
+	dbgprint("saveToXMLFile : saving data finished", 2)
+end
+
+function AnalogPedal:onReadStream(streamId, connection)
+	dbgprint("onReadStream", 3)
+	local spec = self.spec_AnalogPedal
+	spec.isActive = streamReadBool(streamId)
+	spec.overrideAnalog = streamReadBool(streamId)
+	AnalogPedal.incRate = streamReadFloat32(streamId)
+	AnalogPedal.decRate = streamReadFloat32(streamId)
+end
+
+function AnalogPedal:onWriteStream(streamId, connection)
+	dbgprint("onWriteStream", 3)
+	local spec = self.spec_AnalogPedal
+	streamWriteBool(streamId, spec.isActive)
+	streamWriteBool(streamId, spec.overrideAnalog)
+	streamWriteFloat32(streamId, AnalogPedal.incRate)
+	streamWriteFloat32(streamId, AnalogPedal.decRated)
+	end
+end
+	
+function AnalogPedal:onReadUpdateStream(streamId, timestamp, connection)
+	if not connection:getIsServer() then
+		local spec = self.spec_AnalogPedal
+		if streamReadBool(streamId) then
+			dbgprint("onReadUpdateStream: receiving data...", 4)
+			spec.isActive = streamReadBool(streamId)
+			spec.overrideAnalog = streamReadBool(streamId)
+			AnalogPedal.incRate = streamReadFloat32(streamId)
+			AnalogPedal.decRate = streamReadFloat32(streamId)
+		end
+	end
+end
+
+function AnalogPedal:onWriteUpdateStream(streamId, connection, dirtyMask)
+	if connection:getIsServer() then
+		local spec = self.spec_AnalogPedal
+		if streamWriteBool(streamId, bitAND(dirtyMask, spec.dirtyFlag) ~= 0) then
+			dbgprint("onWriteUpdateStream: sending data...", 4)
+			streamWriteBool(streamId, spec.isActive)
+			streamWriteBool(streamId, spec.overrideAnalog)
+			streamWriteFloat32(streamId, AnalogPedal.incRate)
+			streamWriteFloat32(streamId, AnalogPedal.decRated)
+		end
+	end
 end
 
 function AnalogPedal:onRegisterActionEvents(isActiveForInput)
@@ -108,65 +191,11 @@ end
 function AnalogPedal:TOGGLESTATE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.isActive = not spec.isActive
-	AnalogPedal.saveSettings(self)
 end
 
 function AnalogPedal:TOGGLEOVERRIDE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.overrideAnalog = not spec.overrideAnalog
-	AnalogPedal.saveSettings(self)
-end
-
--- load / save settings
-
-function AnalogPedal:saveSettings()
-	local spec = self.spec_AnalogPedal
-	
-	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
-	local key = "settings"
-	local saved = false
-	
-	createFolder(AnalogPedal.MODSETTINGSDIR)
-	local xmlFile = XMLFile.create("settingsXML", filename, key)
-
-	if spec~= nil and xmlFile ~= nil then 		
-		dbgprint("saveSettings : key: "..tostring(key), 2)
-
-		xmlFile:setBool(key..".isActive", spec.isActive)
-		xmlFile:setBool(key..".overrideAnalog", spec.overrideAnalog)
-		xmlFile:setFloat(key.."incRate", AnalogPedal.incRate)
-		xmlFile:setFloat(key.."decRate", AnalogPedal.decRate)
-		
-		xmlFile:save()
-		xmlFile:delete()
-		dbgprint("saveSettings : saving data finished", 2)
-		saved = true
-	end
-	return saved
-end
-
-function AnalogPedal:loadSettings()
-	local spec = self.spec_AnalogPedal
-	local loaded = false
-	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
-	local key = "settings"
-	
-	createFolder(AnalogPedal.MODSETTINGSDIR)
-	local xmlFile = XMLFile.loadIfExists("settingsXML", filename, key)
-	
-	if spec ~= nil and xmlFile ~= nil then
-		dbgprint("loadSettings : spec: "..tostring(spec), 2)
-	
-		spec.isActive = xmlFile:getBool(key..".isActive") or spec.isActive
-		spec.overrideAnalog = xmlFile:getBool(key..".overrideAnalog") or spec.overrideAnalog
-		AnalogPedal.incRate = xmlFile:getFloat(key..".incRate") or AnalogPedal.incRate
-		AnalogPedal.decRate = xmlFile:getFloat(key..".decRate") or AnalogPedal.decRate
-
-		xmlFile:delete()
-		dbgprint("loadSettings : loading data finished", 2)
-		loaded = true
-	end
-	return loaded, spec
 end
 
 -- Main part
