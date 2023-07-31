@@ -193,11 +193,13 @@ end
 function AnalogPedal:TOGGLESTATE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.isActive = not spec.isActive
+	self:raiseDirtyFlags(spec.dirtyFlag)
 end
 
 function AnalogPedal:TOGGLEOVERRIDE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.overrideAnalog = not spec.overrideAnalog
+	self:raiseDirtyFlags(spec.dirtyFlag)
 end
 
 -- Main part
