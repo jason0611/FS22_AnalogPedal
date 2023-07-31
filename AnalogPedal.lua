@@ -78,8 +78,9 @@ function AnalogPedal.registerEventListeners(vehicleType)
 end
 
 function AnalogPedal.initSpecialization()
+	local schemaSavegame = Vehicle.xmlSchemaSavegame
 	dbgprint("initSpecialization : start", 2)
-	local schemaKey = AnalogPedal.MOD_NAME..".AnalogPedal"
+	local key = AnalogPedal.MOD_NAME..".AnalogPedal"
 	schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?)."..key.."#isActive", "APD actived", false)
 	schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?)."..key.."#overrideAnalog", "Override analogue input", false)
     schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?)."..key.."#incRate", "Increase rate", 0.02)
@@ -109,11 +110,13 @@ function AnalogPedal:onPostLoad(savegame)
 	
 	if savegame ~= nil then	
 		dbgprint("onPostLoad : loading saved data", 2)
+		local xmlFile = savegame.xmlFile
+		local key = savegame.key .."."..AnalogPedal.MOD_NAME..".AnalogPedal"
 	
-		spec.isActive = xmlFile:getValue(key..".isActive", spec.isActive)
-		spec.overrideAnalog = xmlFile:getValue(key..".overrideAnalog", spec.overrideAnalog)
-		AnalogPedal.incRate = xmlFile:getFloat(key..".incRate") or AnalogPedal.incRate
-		AnalogPedal.decRate = xmlFile:getFloat(key..".decRate") or AnalogPedal.decRate
+		spec.isActive = xmlFile:getValue(key.."#isActive", spec.isActive)
+		spec.overrideAnalog = xmlFile:getValue(key.."#overrideAnalog", spec.overrideAnalog)
+		AnalogPedal.incRate = xmlFile:getFloat(key.."#incRate") or AnalogPedal.incRate
+		AnalogPedal.decRate = xmlFile:getFloat(key.."#decRate") or AnalogPedal.decRate
 		
 		dbgprint("onPostLoad : Loaded data for "..self:getName(), 1)
 	end
@@ -123,10 +126,10 @@ function AnalogPedal:saveToXMLFile(xmlFile, key, usedModNames)
 	dbgprint("saveToXMLFile", 2)
 	local spec = self.spec_AnalogPedal
 		
-	xmlFile:setValue(key..".isActive", spec.isActive)
-	xmlFile:setValue(key..".overrideAnalog", spec.overrideAnalog)
-	xmlFile:setValue(key..".incRate", AnalogPedal.incRate)
-	xmlFile:setValue(key..".decRate", AnalogPedal.decRate)	
+	xmlFile:setValue(key.."#isActive", spec.isActive)
+	xmlFile:setValue(key.."#overrideAnalog", spec.overrideAnalog)
+	xmlFile:setValue(key.."#incRate", AnalogPedal.incRate)
+	xmlFile:setValue(key.."#decRate", AnalogPedal.decRate)	
 		
 	dbgprint("saveToXMLFile : saving data finished", 2)
 end
