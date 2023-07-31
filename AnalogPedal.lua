@@ -147,7 +147,6 @@ function AnalogPedal:onWriteStream(streamId, connection)
 	streamWriteBool(streamId, spec.overrideAnalog)
 	streamWriteFloat32(streamId, AnalogPedal.incRate)
 	streamWriteFloat32(streamId, AnalogPedal.decRated)
-	end
 end
 	
 function AnalogPedal:onReadUpdateStream(streamId, timestamp, connection)
