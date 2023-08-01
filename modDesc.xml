@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="64">
+<modDesc descVersion="75">
 
   <author>Jason06</author>
    	
-	<version>0.9.9.0</version>
+	<version>1.0.0.0</version>
 
   	<title>
 		<en>Analogue Pedal</en>
