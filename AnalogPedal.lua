@@ -83,8 +83,6 @@ function AnalogPedal.initSpecialization()
 	local key = AnalogPedal.MOD_NAME..".AnalogPedal"
 	schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?)."..key.."#isActive", "APD actived", false)
 	schemaSavegame:register(XMLValueType.BOOL, "vehicles.vehicle(?)."..key.."#overrideAnalog", "Override analogue input", false)
-    schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?)."..key.."#incRate", "Increase rate", 0.02)
-	schemaSavegame:register(XMLValueType.FLOAT, "vehicles.vehicle(?)."..key.."#decRate", "Audible alert volume", 0.01)
 	dbgprint("initSpecialization: finished xmlSchemaSavegame registration process", 1)
 end
 
@@ -115,8 +113,8 @@ function AnalogPedal:onPostLoad(savegame)
 	
 		spec.isActive = xmlFile:getValue(key.."#isActive", spec.isActive)
 		spec.overrideAnalog = xmlFile:getValue(key.."#overrideAnalog", spec.overrideAnalog)
-		AnalogPedal.incRate = xmlFile:getFloat(key.."#incRate") or AnalogPedal.incRate
-		AnalogPedal.decRate = xmlFile:getFloat(key.."#decRate") or AnalogPedal.decRate
+		
+		_, spec = AnalogPedal.loadSettings(self)
 		
 		dbgprint("onPostLoad : Loaded data for "..self:getName(), 1)
 	end
@@ -128,8 +126,6 @@ function AnalogPedal:saveToXMLFile(xmlFile, key, usedModNames)
 		
 	xmlFile:setValue(key.."#isActive", spec.isActive)
 	xmlFile:setValue(key.."#overrideAnalog", spec.overrideAnalog)
-	xmlFile:setValue(key.."#incRate", AnalogPedal.incRate)
-	xmlFile:setValue(key.."#decRate", AnalogPedal.decRate)	
 		
 	dbgprint("saveToXMLFile : saving data finished", 2)
 end
@@ -139,8 +135,6 @@ function AnalogPedal:onReadStream(streamId, connection)
 	local spec = self.spec_AnalogPedal
 	spec.isActive = streamReadBool(streamId)
 	spec.overrideAnalog = streamReadBool(streamId)
-	AnalogPedal.incRate = streamReadFloat32(streamId)
-	AnalogPedal.decRate = streamReadFloat32(streamId)
 end
 
 function AnalogPedal:onWriteStream(streamId, connection)
@@ -148,8 +142,6 @@ function AnalogPedal:onWriteStream(streamId, connection)
 	local spec = self.spec_AnalogPedal
 	streamWriteBool(streamId, spec.isActive)
 	streamWriteBool(streamId, spec.overrideAnalog)
-	streamWriteFloat32(streamId, AnalogPedal.incRate)
-	streamWriteFloat32(streamId, AnalogPedal.decRated)
 end
 	
 function AnalogPedal:onReadUpdateStream(streamId, timestamp, connection)
@@ -159,8 +151,6 @@ function AnalogPedal:onReadUpdateStream(streamId, timestamp, connection)
 			dbgprint("onReadUpdateStream: receiving data...", 4)
 			spec.isActive = streamReadBool(streamId)
 			spec.overrideAnalog = streamReadBool(streamId)
-			AnalogPedal.incRate = streamReadFloat32(streamId)
-			AnalogPedal.decRate = streamReadFloat32(streamId)
 		end
 	end
 end
@@ -172,8 +162,6 @@ function AnalogPedal:onWriteUpdateStream(streamId, connection, dirtyMask)
 			dbgprint("onWriteUpdateStream: sending data...", 4)
 			streamWriteBool(streamId, spec.isActive)
 			streamWriteBool(streamId, spec.overrideAnalog)
-			streamWriteFloat32(streamId, AnalogPedal.incRate)
-			streamWriteFloat32(streamId, AnalogPedal.decRated)
 		end
 	end
 end
@@ -200,6 +188,54 @@ function AnalogPedal:TOGGLEOVERRIDE(actionName, keyStatus, arg3, arg4, arg5)
 	local spec = self.spec_AnalogPedal
 	spec.overrideAnalog = not spec.overrideAnalog
 	self:raiseDirtyFlags(spec.dirtyFlag)
+end
+
+-- load / save settings
+
+function AnalogPedal:saveSettings()
+	local spec = self.spec_AnalogPedal
+	
+	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
+	local key = "settings"
+	local saved = false
+	
+	createFolder(AnalogPedal.MODSETTINGSDIR)
+	local xmlFile = XMLFile.create("settingsXML", filename, key)
+
+	if spec~= nil and xmlFile ~= nil then 		
+		dbgprint("saveSettings : key: "..tostring(key), 2)
+
+		xmlFile:setFloat(key.."incRate", AnalogPedal.incRate)
+		xmlFile:setFloat(key.."decRate", AnalogPedal.decRate)
+		
+		xmlFile:save()
+		xmlFile:delete()
+		dbgprint("saveSettings : saving data finished", 2)
+		saved = true
+	end
+	return saved
+end
+
+function AnalogPedal:loadSettings()
+	local spec = self.spec_AnalogPedal
+	local loaded = false
+	local filename = AnalogPedal.MODSETTINGSDIR.."settings.xml"
+	local key = "settings"
+	
+	createFolder(AnalogPedal.MODSETTINGSDIR)
+	local xmlFile = XMLFile.loadIfExists("settingsXML", filename, key)
+	
+	if spec ~= nil and xmlFile ~= nil then
+		dbgprint("loadSettings : spec: "..tostring(spec), 2)
+	
+		AnalogPedal.incRate = xmlFile:getFloat(key..".incRate") or AnalogPedal.incRate
+		AnalogPedal.decRate = xmlFile:getFloat(key..".decRate") or AnalogPedal.decRate
+
+		xmlFile:delete()
+		dbgprint("loadSettings : loading data finished", 2)
+		loaded = true
+	end
+	return loaded, spec
 end
 
 -- Main part
