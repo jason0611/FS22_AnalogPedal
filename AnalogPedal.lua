@@ -269,8 +269,8 @@ function AnalogPedal:onDraw(dt)
 		local w = 0.015 * scale
 		local h = 0.015 * scale * g_screenAspectRatio * spec.pedalRate
 		renderOverlay(AnalogPedal.guiIcon, x, y, w, h)
-	else
-		g_currentMission:addExtraPrintText(throttle..g_i18n.modEnvironments[AnalogPedal.MOD_NAME]:getText("text_APD_off"))
+	--else
+	--	g_currentMission:addExtraPrintText(throttle..g_i18n.modEnvironments[AnalogPedal.MOD_NAME]:getText("text_APD_off"))
 	end
 end
 
